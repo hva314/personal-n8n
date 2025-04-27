@@ -1,0 +1,6 @@
+http:
+  middlewares:
+    n8n-auth:
+      basicAuth:
+        users:
+          - "blue:$apr1$icUY7T8J$D0owjxi8sRLn15qdCoFxL1" # advanced classic
