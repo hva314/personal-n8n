@@ -23,8 +23,7 @@ x-n8n: &service-n8n
     - N8N_PERSONALIZATION_ENABLED=false
     - N8N_ENCRYPTION_KEY
     - N8N_USER_MANAGEMENT_JWT_SECRET
-    - WEBHOOK_URL=https://blueorchid314.ddns.net:8443
-    # - N8N_EDITOR_BASE_URL=https://blueorchid314.ddns.net:5678
+    - WEBHOOK_URL=https://${HOSTNAME}:8443
     - OLLAMA_HOST=ollama:11434
   env_file:
     - .env
@@ -97,22 +96,20 @@ services:
       - ./shared:/data/shared
     labels:
       - "traefik.enable=true"
-      # - "traefik.http.routers.n8n.tls.domains[0].main=blueorchid314.ddns.net"
-      #- - "traefik.http.routers.n8n.rule=Host(`blueorchid314.ddns.net`)"
-      - "traefik.http.routers.n8n-secure-router.rule=Host(`blueorchid314.ddns.net`) && PathPrefix(`/`) && !PathPrefix(`/webhook`)"
+      - "traefik.http.routers.n8n-secure-router.rule=Host(`${HOSTNAME}`) && PathPrefix(`/`) && !PathPrefix(`/webhook`)"
       - "traefik.http.routers.n8n-secure-router.entrypoints=n8n-secure"
       - "traefik.http.routers.n8n-secure-router.tls=true"
       - "traefik.http.routers.n8n-secure-router.middlewares=n8n-auth@file"
       - "traefik.http.routers.n8n-secure-router.service=n8n-container"
       - "traefik.http.services.n8n-container.loadbalancer.server.port=5678"
 
-      - "traefik.http.routers.n8n-webhook-router.rule=Host(`blueorchid314.ddns.net`) && PathPrefix(`/webhook`)"
+      - "traefik.http.routers.n8n-webhook-router.rule=Host(`${HOSTNAME}`) && PathPrefix(`/webhook`)"
       - "traefik.http.routers.n8n-webhook-router.entrypoints=websecure"
       - "traefik.http.routers.n8n-webhook-router.tls=true"
       - "traefik.http.routers.n8n-webhook-router.service=n8n-container"
       - "traefik.http.services.n8n-container.loadbalancer.server.port=5678"
 
-      - "traefik.http.routers.n8n-mcp-server.rule=Host(`blueorchid314.ddns.net`) && PathPrefix(`/mcp`)"
+      - "traefik.http.routers.n8n-mcp-server.rule=Host(`${HOSTNAME}`) && PathPrefix(`/mcp`)"
       - "traefik.http.routers.n8n-mcp-server.entrypoints=websecure"
       - "traefik.http.routers.n8n-mcp-server.tls=true"
       - "traefik.http.routers.n8n-mcp-server.service=n8n-container"
@@ -137,21 +134,21 @@ services:
       # - "--certificatesresolvers.default.acme.email=admin@example.com"
       # - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       # - "--certificatesresolvers.default.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
-      # - "--certificatesresolvers.letsencrypt.acme.email=admin@blueorchid314.ddns.net"
+      # - "--certificatesresolvers.letsencrypt.acme.email=admin@test.local"
       # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
       # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
       # - "--certificatesresolvers.letsencrypt.acme.caServer=https://acme-v02.api.letsencrypt.org/directory"
       # - "--log.level=DEBUG"
       - "--entrypoints.n8n-secure.address=:5678"
       - "--entrypoints.n8n-secure.http.tls=true"
-      - "--entrypoints.n8n-secure.http.tls.domains[0].main=blueorchid314.ddns.net"
-      - "--entrypoints.n8n-secure.http.tls.domains[0].sans=blueorchid314.ddns.net"
+      - "--entrypoints.n8n-secure.http.tls.domains[0].main=${HOSTNAME}"
+      - "--entrypoints.n8n-secure.http.tls.domains[0].sans=${HOSTNAME}"
       - "--entrypoints.n8n-secure.http.tls.certresolver=default"
 
       - "--entrypoints.websecure.address=:8443"
       - "--entrypoints.websecure.http.tls=true"
-      - "--entrypoints.websecure.http.tls.domains[0].main=blueorchid314.ddns.net"
-      - "--entrypoints.websecure.http.tls.domains[0].sans=blueorchid314.ddns.net"
+      - "--entrypoints.websecure.http.tls.domains[0].main=${HOSTNAME}"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=${HOSTNAME}"
       - "--entrypoints.websecure.http.tls.certresolver=default"
 
       - "--providers.file.directory=/etc/traefik/dynamic"
